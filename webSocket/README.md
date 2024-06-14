@@ -38,7 +38,7 @@ wsServer.start()
 #### 连接
 
 ```js
-import WsClient from '../webSocket/client.js'
+import WsClient from './client.js'
 
 window.wsClient = new WsClient('mainWindow')
 await wsClient.connect()
