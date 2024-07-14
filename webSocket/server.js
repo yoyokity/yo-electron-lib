@@ -137,7 +137,7 @@ class WsServer {
 
                             if (this.#sendListeners.size > 0) {
                                 let a = this.#sendListeners.get(message.name)
-                                if (a.clientName === undefined || a.clientName === null || a.clientName === clientName) {
+                                if (a !== undefined && (a.clientName === clientName || a.clientName === null)) {
                                     a.func(message)
                                 }
                             }
@@ -151,7 +151,7 @@ class WsServer {
 
                             if (this.#invokeListeners.size > 0) {
                                 let a = this.#invokeListeners.get(message.name)
-                                if (a.clientName === clientName || a.clientName === null) {
+                                if (a !== undefined && (a.clientName === clientName || a.clientName === null)) {
                                     let handle = new InvokeClient(message.invokeId, ws, clientName)
                                     a.func(message, handle)
                                 }
