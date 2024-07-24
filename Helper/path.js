@@ -128,8 +128,12 @@ export class Pathlib {
         return new Path(this.#dataDir)
     }
 
+    /**
+     * 此目录存储由 Session 生成的数据，例如 localStorage，cookies，磁盘缓存，下载的字典，网络 状态，开发者工具文件等。 默认为 userData 目录。
+     * @return {Path}
+     */
     get sessionDataDir () {
-        return yoyoNode.app.getPath('sessionData')
+        return new Path(yoyoNode.app.getPath('sessionData'))
     }
 
     /**
@@ -137,6 +141,15 @@ export class Pathlib {
      */
     get tempDir () {
         return new Path(process.env.TEMP)
+    }
+
+    /**
+     * 是否为完整路径
+     * @param {string} path
+     * @returns {boolean}
+     */
+    isAbsolute (path) {
+        return _path.isAbsolute(path)
     }
 
     /**
@@ -155,7 +168,7 @@ export class Pathlib {
                 if (!fileDir.isExist) {
                     fs.mkdirSync(fileDir.str, { recursive: true })
                 }
-                if (basePath.isExist){
+                if (basePath.isExist) {
                     fs.unlinkSync(basePath.str)
                 }
                 fs.writeFileSync(basePath.str, '')
@@ -206,6 +219,10 @@ export class Pathlib {
         return allFiles
     }
 
+    /**
+     * 删除文件或文件夹
+     * @param path
+     */
     delete (path) {
         const basePath = new Path(path)
         if (!basePath.isExist) return
@@ -221,6 +238,49 @@ export class Pathlib {
             } catch (e) {
                 console.warn(`delete "${path}" failed: ${e.message}`)
             }
+        }
+    }
+
+    /**
+     * 移动或复制文件
+     * @param {string} sourceFile 源文件
+     * @param {string} targetPath 新文件所在文件夹路径，默认空为原文件夹
+     * @param {string} newFileName 新文件名（不包含后缀名），默认空为原文件名
+     * @param {boolean} isCopy 是否为复制，默认移动文件
+     * @returns {Promise<void>}
+     */
+    async moveFile (sourceFile, targetPath = '', newFileName = '', isCopy = false) {
+        //检查原路径
+        const sourceFilePath = new Path(sourceFile)
+        if (!sourceFilePath.isExist) return
+        if (sourceFilePath.isDir) return
+
+        //检查新路径
+        if (targetPath === '') targetPath = sourceFilePath.parent.str
+        let targetDirectoryPath = new Path(targetPath)
+        if (!targetDirectoryPath.isExist) this.createPath(targetPath)
+        if (targetDirectoryPath.isFile) targetDirectoryPath = targetDirectoryPath.parent
+
+        if (newFileName === '') newFileName = sourceFilePath.basename
+        let extname = sourceFilePath.extname
+        let targetFilePath = targetDirectoryPath.join(newFileName + extname)
+
+        if (sourceFilePath.str === targetFilePath.str) return
+
+        //
+        if (isCopy) {
+            try {
+                await fs.promises.copyFile(sourceFilePath.str, targetFilePath.str)
+                return
+            } catch (error) {
+                console.error('Error copy file:', error)
+            }
+        }
+
+        try {
+            await fs.promises.rename(sourceFilePath.str, targetFilePath.str)
+        } catch (error) {
+            console.error('Error moving file:', error)
         }
     }
 }
