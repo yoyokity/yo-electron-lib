@@ -1,10 +1,13 @@
 import { Cmd } from './cmd.js'
 import { Pathlib } from './path.js'
+import { Logging } from './logging.js'
 
 export const Helper = {
     Cmd,
     /** @type {Pathlib} */
     path: null,
+    /** @type {Logging} */
+    logging: null,
     /**
      * 初始化，放在入口文件最开头，
      *
@@ -18,6 +21,11 @@ export const Helper = {
      */
     init: (appDir, dataDir) => {
         Helper.path = new Pathlib(appDir, dataDir)
+
+        //log目录
+        let logDir = Helper.path.appDir.join('log')
+        Helper.path.createPath(logDir.str)
+        Helper.logging = new Logging(logDir)
     }
 }
 
