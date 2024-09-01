@@ -278,7 +278,8 @@ export class Pathlib {
         }
 
         try {
-            await fs.promises.rename(sourceFilePath.str, targetFilePath.str)
+            await fs.promises.copyFile(sourceFilePath.str, targetFilePath.str)
+            await fs.promises.unlink(sourceFilePath.str);
         } catch (error) {
             console.error('Error moving file:', error)
         }

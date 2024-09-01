@@ -20,6 +20,9 @@ export const Helper = {
      * @param {string} dataDir 程序内部根目录
      */
     init: (appDir, dataDir) => {
+        if (appDir.endsWith('\\resources\\app.asar')){
+            appDir = appDir.replace('\\resources\\app.asar', '')
+        }
         Helper.path = new Pathlib(appDir, dataDir)
 
         //log目录
