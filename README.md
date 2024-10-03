@@ -66,3 +66,17 @@ window.wsClient = new WsClient('mainWindow')
 await wsClient.connect()
 ```
 
+
+
+
+
+# 渲染进程读取文件路径模块
+
+在渲染进程中使用
+
+```javascript
+window.electronAPI.getFilePath(file)
+```
+
+- file为File对象，一般通过`e.dataTransfer.files`获得
+- 返回path文本
