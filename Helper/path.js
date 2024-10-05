@@ -1,5 +1,6 @@
 import _path from 'path'
 import fs from 'fs'
+import { execSync } from 'child_process'
 
 class Path {
     /**
@@ -267,7 +268,7 @@ export class Pathlib {
 
         if (sourceFilePath.str === targetFilePath.str) return
 
-        //
+        //复制文件
         if (isCopy) {
             try {
                 await fs.promises.copyFile(sourceFilePath.str, targetFilePath.str)
@@ -277,11 +278,12 @@ export class Pathlib {
             }
         }
 
-        try {
-            await fs.promises.copyFile(sourceFilePath.str, targetFilePath.str)
-            await fs.promises.unlink(sourceFilePath.str);
-        } catch (error) {
-            console.error('Error moving file:', error)
-        }
+        //移动文件
+        let com = process.platform === 'win32' ? 'move' : 'mv'
+        execSync(`${com} "${sourceFilePath.str}" "${targetFilePath.str}"`, (error, stdout, stderr) => {
+            if (error) {
+                console.error('Error moving file:', error.message)
+            }
+        })
     }
 }
