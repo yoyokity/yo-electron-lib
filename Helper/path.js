@@ -2,6 +2,10 @@ import _path from 'path'
 import fs from 'fs'
 import { execSync } from 'child_process'
 
+String.prototype.getPath = function () {
+    return new Path(this)
+}
+
 class Path {
     /**
      * @type {string}
@@ -151,6 +155,31 @@ export class Pathlib {
      */
     isAbsolute (path) {
         return _path.isAbsolute(path)
+    }
+
+    /**
+     * 替换掉路径中的非法字符
+     * @param {string} path
+     * @return {string}
+     */
+    sanitizePath (path) {
+        const fullWidthMap = {
+            '?': '？',
+            '"': '＂',
+            '<': '＜',
+            '>': '＞',
+            '|': '｜'
+        }
+
+        // 1. 替换非法字符为全角符号
+        let sanitized = path.replace(/[?"<>|]/g, (char) => {
+            return fullWidthMap[char] || ''
+        })
+
+        // 2. 移除开头和结尾的非法字符（如空格、点）
+        return  sanitized
+            .replace(/^[.\s]+/, '')
+            .replace(/[.\s]+$/, '')
     }
 
     /**
