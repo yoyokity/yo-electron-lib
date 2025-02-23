@@ -18,18 +18,21 @@ export const Helper = {
      * Helper.init(process.cwd(), join(__dirname, '../'))
      * @param {string} appDir 程序所在根目录
      * @param {string} dataDir 程序内部根目录
+     * @param {boolean} logOn 是否开启日志
      */
-    init: (appDir, dataDir) => {
+    init: (appDir, dataDir,logOn = true) => {
         Helper.path = new Pathlib(appDir, dataDir)
-
-        //log目录
-        let logDir = Helper.path.appDir.join('log')
-        Helper.path.createPath(logDir.str)
-        Helper.logging = new Logging(logDir)
-
         console.log(`appDir: ${appDir}`)
         console.log(`dataDir: ${dataDir}`)
-        console.log(`logDir: ${logDir.str}`)
+
+        if (logOn) {
+            //log目录
+            let logDir = Helper.path.appDir.join('log')
+            Helper.path.createPath(logDir.str)
+            Helper.logging = new Logging(logDir)
+
+            console.log(`logDir: ${logDir.str}`)
+        }
     }
 }
 
