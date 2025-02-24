@@ -191,22 +191,31 @@ export class Pathlib {
     createPath (path) {
         const basePath = new Path(path)
         try {
-            if (basePath.isDir) {
-                if (!basePath.isExist) fs.mkdirSync(basePath.str, { recursive: true })
-            } else if (basePath.isFile) {
-                const fileDir = basePath.parent
-                if (!fileDir.isExist) {
-                    fs.mkdirSync(fileDir.str, { recursive: true })
-                }
-                if (basePath.isExist) {
-                    fs.unlinkSync(basePath.str)
-                }
-                fs.writeFileSync(basePath.str, '')
-            } else {
-                throw new Error(`"${path}" is not a directory or file`)
-            }
+            if (!basePath.isExist) 
+                fs.mkdirSync(basePath.str, { recursive: true })
         } catch (e) {
             console.warn(`"${path}" create failed: ${e.message}`)
+        }
+    }
+
+    /**
+     * 创建文件（自动创建父目录，覆盖已存在文件）
+     * @param {string} path 要创建的文件路径
+     */
+    createFile(path) {
+        try {
+            const basePath = new Path(path)
+            const fileDir = basePath.parent
+            if (!fileDir.isExist) {
+                fs.mkdirSync(fileDir.str, { recursive: true })
+            }
+            if (basePath.isExist) {
+                fs.unlinkSync(basePath.str)
+            }
+            fs.writeFileSync(basePath.str, '')
+        } catch (e) {
+            console.warn(`File "${path}" creation failed: ${e.message}`);
+            throw e; // 可选择重新抛出错误
         }
     }
 
