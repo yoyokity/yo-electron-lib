@@ -33,6 +33,70 @@ export const Helper = {
 
             console.log(`logDir: ${logDir.str}`)
         }
+    },
+
+    /**
+     * 包装异步函数的try-catch逻辑，简化错误处理
+     *
+     * 示例：
+     * const [err, result] = await Helper.tryAsync(async () => {
+     *     return await someAsyncFunction();
+     * });
+     *
+     * if (err) {
+     *     console.error('发生错误:', err);
+     *     return;
+     * }
+     *
+     * console.log('操作成功:', result);
+     *
+     * @param {Function} fn 需要执行的异步函数
+     * @param {Function} [errorHandler] 可选的错误处理函数
+     * @returns {Promise<[Error|null, any]>} 返回一个包含错误和结果的数组
+     */
+    tryAsync: async (fn, errorHandler) => {
+        try {
+            const result = await fn();
+            return [null, result];
+        } catch (err) {
+            if (Helper.logging) {
+                Helper.logging.error(err);
+            }
+
+            if (typeof errorHandler === 'function') {
+                errorHandler(err);
+            }
+
+            return [err, null];
+        }
+    },
+
+    /**
+     * 包装同步函数的try-catch逻辑，简化错误处理
+     *
+     * 示例：
+     * const [err, result] = Helper.trySync(() => {
+     *     return someSyncFunction();
+     * });
+     *
+     * @param {Function} fn 需要执行的同步函数
+     * @param {Function} [errorHandler] 可选的错误处理函数
+     * @returns {[Error|null, any]} 返回一个包含错误和结果的数组
+     */
+    trySync: (fn, errorHandler) => {
+        try {
+            const result = fn();
+            return [null, result];
+        } catch (err) {
+            if (Helper.logging) {
+                Helper.logging.error(err);
+            }
+
+            if (typeof errorHandler === 'function') {
+                errorHandler(err);
+            }
+
+            return [err, null];
+        }
     }
 }
-
